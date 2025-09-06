@@ -1,4 +1,4 @@
-package com.selfemploye.naturaldisaster.ui.theme
+package com.selfemploye.naturaldisaster.frontend.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.selfemploye.naturaldisaster.ui.theme
+package com.selfemploye.naturaldisaster.frontend.ui.theme
 
 import android.app.Activity
 import android.os.Build
