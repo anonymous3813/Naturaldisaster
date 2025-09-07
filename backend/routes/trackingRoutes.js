@@ -3,12 +3,9 @@ import { respondToUserController, markUserSafeController, getCounterController }
 
 const router = express.Router();
 
-
 router.post('/safe', markUserSafeController);
 
-
 router.post('/respond', respondToUserController);
-
 
 router.get('/counter', getCounterController);
 

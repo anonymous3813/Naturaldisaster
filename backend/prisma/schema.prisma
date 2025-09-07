@@ -21,7 +21,16 @@ model Alert {
   userId    String
   message   String
   read      Boolean  @default(false)
+  alertType String   @default("general")
   timestamp DateTime @default(now())
+}
+
+model UserDevice {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  pushToken   String
+  deviceType  String   @default("android")
+  lastUpdated DateTime @default(now())
 }
 
 model StormSnapshot {

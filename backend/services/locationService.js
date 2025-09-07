@@ -10,7 +10,6 @@ export async function saveUserLocation(userId, lon, lat, danger = 0) {
     create: { userId, lat, lon, timestamp: new Date() },
   });
 
- 
   priorityQueue.push({ userId, lat, lon, danger });
 }
 
