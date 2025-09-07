@@ -1,5 +1,5 @@
 import { getStormsWithZones } from '../services/stormService.js';
-import { alertUsers } from '../services/notificationService.js';
+import { createAlert } from '../services/notificationService.js';
 
 export const updateStorms = async (req, res) => {
   try {
@@ -7,7 +7,7 @@ export const updateStorms = async (req, res) => {
 
     for (const storm of storms) {
       if (storm.priorityQueue && storm.priorityQueue.length > 0) {
-        await alertUsers(storm.priorityQueue);
+        await createAlert(storm.priorityQueue);
       }
       console.log(`Storm ${storm.name} affected ${storm.priorityQueue?.length || 0} users`);
     }

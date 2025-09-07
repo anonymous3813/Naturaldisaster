@@ -1,15 +1,15 @@
 import express from 'express';
-import { respondToUser, markUserSafe, getCounter } from '../controllers/trackingController.js';
+import { respondToUserController, markUserSafeController, getCounterController } from '../controllers/trackingController.js';
 
 const router = express.Router();
 
 
-router.post('/safe', markUserSafe);
+router.post('/safe', markUserSafeController);
 
 
-router.post('/respond', respondToUser);
+router.post('/respond', respondToUserController);
 
 
-router.get('/counter', getCounter);
+router.get('/counter', getCounterController);
 
 export default router;

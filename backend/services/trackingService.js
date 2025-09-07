@@ -1,6 +1,7 @@
-import { prisma } from './prisma.js';
-import { getDistance } from './priorityService.js'; 
+import { PrismaClient } from '@prisma/client';
+import { getDistance } from './priorityQueue.js'; 
 
+const prisma = new PrismaClient();
 
 export async function markUserSafe(responderId, userId, responderLat, responderLon, radiusFeet = 50) {
   const user = await prisma.userLocation.findUnique({ where: { userId } });
@@ -34,6 +35,20 @@ export async function respondToUser(responderId, userId, responderLat, responder
   }
 
   return { success: false, error: 'User is outside the allowed radius' };
+}
+
+export async function getRescueStats() {
+  const totalUsers = await prisma.userLocation.count();
+  const safeUsers = await prisma.userLocation.count({ where: { safe: true } });
+  const atRiskUsers = totalUsers - safeUsers;
+  
+  return {
+    totalUsers,
+    safeUsers,
+    atRiskUsers,
+    activeResponders: 0, // This would need to be tracked separately
+    rescueAttempts: 0    // This would need to be tracked separately
+  };
 }
 
 
