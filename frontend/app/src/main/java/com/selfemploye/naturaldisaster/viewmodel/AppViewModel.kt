@@ -12,7 +12,6 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.selfemploye.naturaldisaster.data.ApiService
 import com.selfemploye.naturaldisaster.data.RetrofitInstance
 import com.selfemploye.naturaldisaster.data.UserPrefs
 import com.selfemploye.naturaldisaster.data.dataStore
@@ -51,6 +50,7 @@ class AppViewModel(
         viewModelScope.launch {
             _userId.value = getOrCreateUserId()
             fetchAllLocations()
+            Log.d("View model location fetch", allLocations.value.toString())
         }
     }
 
@@ -69,7 +69,7 @@ class AppViewModel(
         val locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 result.lastLocation?.let { location ->
-                    val newLocation = UserLocation(location.latitude, location.longitude, 3)
+                    val newLocation = UserLocation(_userId.value?:"randomId",location.latitude, location.longitude, 3)
                     setLastLocation(newLocation)
                 }
             }
@@ -95,9 +95,10 @@ class AppViewModel(
         .map { prefs ->
             val lat = prefs[UserPrefs.LAST_LAT] ?: 0.0
             val lon = prefs[UserPrefs.LAST_LON] ?: 0.0
-            UserLocation(lat, lon, 3)
+            val id = prefs[UserPrefs.USER_ID] ?: "randomId"
+            UserLocation(id, lat, lon, 3)
         }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, UserLocation(0.0, 0.0, 3))
+        .stateIn(viewModelScope, SharingStarted.Eagerly, UserLocation("randomId",0.0, 0.0, 3))
 
     //Write operations
     private suspend fun getOrCreateUserId(): String {
@@ -134,14 +135,14 @@ class AppViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             dataStore.edit { prefs ->
                 prefs[UserPrefs.LAST_LAT] = newValue.lat
-                prefs[UserPrefs.LAST_LON] = newValue.lng
+                prefs[UserPrefs.LAST_LON] = newValue.lon
             }
             try {
                 val response = RetrofitInstance.api.postLocation(
                     UserLocationRequest(
                         userId = userId.value ?: getOrCreateUserId(),
                         lat = lastLocation.value.lat,
-                        lon = lastLocation.value.lng
+                        lon = lastLocation.value.lon
                     )
                 )
             } catch (e: Exception) {
@@ -151,6 +152,31 @@ class AppViewModel(
     }
 
     //API methods
+    fun removeLocation(location: UserLocation) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val body = SafeOrRespondRequest(
+                    responderId = location.id,
+                    userId = _userId.value?: "randomId",
+                    responderLat = location.lat,
+                    responderLon = location.lon
+                )
+
+                val response1 = RetrofitInstance.api.checkIfUserClose(body)
+                if(response1.isSuccessful && response1.body()?.success == true) {
+                    val response2 = RetrofitInstance.api.markUserSafe(body)
+                    if (response2.isSuccessful) {
+                        _allLocations.value = _allLocations.value.filter {
+                            it.lat != location.lat || it.lon != location.lon
+                        }
+                    }
+                }
+
+            } catch (e: Exception) {
+                Log.e("API", "Failed to fetch counter: ${e.message}")
+            }
+        }
+    }
 
     fun fetchStats() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -166,23 +192,17 @@ class AppViewModel(
         }
     }
 
-    fun fetchAllLocations() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = RetrofitInstance.api.getAllLocations()
-                if(response.isSuccessful) {
-                    if (response.body() != null) {
-                        _allLocations.value = response.body()!!
-                        Log.d("API worked",response.body().toString())
-                    } else {
-                        Log.d("API failed",response.body().toString())
-                    }
-
-
-                }
-            } catch (e: Exception) {
-                Log.e("API", "Exception fetching all locations: ${e.message}")
+    private suspend fun fetchAllLocations() {
+        try {
+            val response = RetrofitInstance.api.getAllLocations()
+            if (response.isSuccessful && response.body() != null) {
+                _allLocations.value = response.body()!!
+                Log.d("API worked", response.body().toString())
+            } else {
+                Log.d("API failed", response.body().toString())
             }
+        } catch (e: Exception) {
+            Log.e("API", "Exception fetching all locations: ${e.message}")
         }
     }
 

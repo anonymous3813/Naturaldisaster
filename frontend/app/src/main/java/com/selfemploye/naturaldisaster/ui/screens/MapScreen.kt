@@ -6,7 +6,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,35 +21,39 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.selfemploye.naturaldisaster.models.UserLocation
 import com.selfemploye.naturaldisaster.viewmodel.AppViewModel
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun MapScreen(
     appViewModel: AppViewModel
 ) {
+    // Observe last known location
     val lastLocation by appViewModel.lastLocation.collectAsState()
     val startingLocation = remember(lastLocation) {
-        LatLng(lastLocation.lat, lastLocation.lng)
+        LatLng(lastLocation.lat, lastLocation.lon)
     }
 
-    var markers by remember {
-        mutableStateOf(
-            appViewModel.allLocations.value
-        )
-    }
+    // Observe all locations from ViewModel
+    val allLocations by appViewModel.allLocations.collectAsState()
 
-
+    // State for the selected marker and dialog visibility
     var selectedMarker by remember { mutableStateOf<UserLocation?>(null) }
     var showDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        Log.d("Map screen coordinates", allLocations.toString())
+    }
+
+    // Google Map
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = rememberCameraPositionState {
             position = CameraPosition.fromLatLngZoom(startingLocation, 12f)
         }
     ) {
-        markers.forEach { loc ->
+        allLocations.forEach { loc ->
             Marker(
-                state = MarkerState(position = LatLng(loc.lat, loc.lng)),
+                state = MarkerState(position = LatLng(loc.lat, loc.lon)),
                 title = "Rescue here",
                 icon = BitmapDescriptorFactory.defaultMarker(loc.getMarkerColor()),
                 onClick = {
@@ -62,30 +65,32 @@ fun MapScreen(
         }
     }
 
-    // Dialog to mark rescue done
-    if (showDialog && selectedMarker != null && appViewModel.isFirstResponder.collectAsState().value) {
-        AlertDialog(
-            onDismissRequest = { showDialog = false },
-            title = { Text("Rescue Confirmation") },
-            text = { Text("Mark this person at ${selectedMarker!!.lat}, ${selectedMarker!!.lng} as rescued?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    selectedMarker?.let { markerToRemove ->
-                        markers =
-                            markers.filter { it.lat != markerToRemove.lat || it.lng != markerToRemove.lng }
-
+    // Dialog to mark a person as rescued
+    if (showDialog && selectedMarker != null) {
+        val isFirstResponder by appViewModel.isFirstResponder.collectAsState()
+        if (isFirstResponder) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Rescue Confirmation") },
+                text = {
+                    Text("Mark this person at ${selectedMarker!!.lat}, ${selectedMarker!!.lon} as rescued?")
+                },
+                confirmButton = {
+                    TextButton(onClick = {
+                        selectedMarker?.let { markerToRemove ->
+                            appViewModel.removeLocation(markerToRemove)
+                        }
+                        showDialog = false
+                    }) {
+                        Text("Yes")
                     }
-
-                    showDialog = false
-                }) {
-                    Text("Yes")
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("No")
+                    }
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDialog = false }) {
-                    Text("No")
-                }
-            }
-        )
+            )
+        }
     }
 }

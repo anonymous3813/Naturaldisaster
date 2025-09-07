@@ -21,7 +21,7 @@ interface ApiService {
     suspend fun markUserSafe(@Body request: SafeOrRespondRequest): Response<SuccessResponse>
 
     @POST("api/track/respond")
-    suspend fun respondToUser(@Body request: SafeOrRespondRequest): Response<SuccessResponse>
+    suspend fun checkIfUserClose(@Body request: SafeOrRespondRequest): Response<SuccessResponse>
 
     @GET("api/track/counter")
     suspend fun getRescueStats(): Response<RescueStatsResponse>

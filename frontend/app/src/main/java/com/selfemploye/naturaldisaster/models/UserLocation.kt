@@ -3,8 +3,9 @@ package com.selfemploye.naturaldisaster.models
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 data class UserLocation(
+    val id: String,
     val lat: Double,
-    val lng: Double,
+    val lon: Double,
     val urgency: Int
 ) {
     fun getMarkerColor(): Float {

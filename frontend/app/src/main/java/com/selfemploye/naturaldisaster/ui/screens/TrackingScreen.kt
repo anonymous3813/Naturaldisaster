@@ -51,7 +51,7 @@ fun TrackingScreen(appViewModel: AppViewModel) {
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
-                    text = "Lng: ${lastLocation.lng}",
+                    text = "Lng: ${lastLocation.lon}",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
