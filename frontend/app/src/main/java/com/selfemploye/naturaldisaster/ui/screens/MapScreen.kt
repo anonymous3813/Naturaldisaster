@@ -2,29 +2,33 @@ package com.selfemploye.naturaldisaster.ui.screens
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
-import com.selfemploye.naturaldisaster.viewmodel.AppViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.selfemploye.naturaldisaster.models.UserLocation
-import androidx.compose.runtime.collectAsState
+import com.selfemploye.naturaldisaster.viewmodel.AppViewModel
 
 @Composable
 fun MapScreen(
     appViewModel: AppViewModel
 ) {
-    val sanFrancisco = LatLng(37.7749, -122.4194)
+    val startingLocation = LatLng(
+        appViewModel.lastLocation.collectAsState().value.lat,
+        appViewModel.lastLocation.collectAsState().value.lng
+    )
 
     var markers by remember {
         mutableStateOf(
@@ -45,7 +49,7 @@ fun MapScreen(
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(sanFrancisco, 12f)
+            position = CameraPosition.fromLatLngZoom(startingLocation, 12f)
         }
     ) {
         markers.forEach { loc ->
@@ -63,7 +67,7 @@ fun MapScreen(
     }
 
     // Dialog to mark rescue done
-    if (showDialog && selectedMarker != null && appViewModel.isFirstResponder.value) {
+    if (showDialog && selectedMarker != null && appViewModel.isFirstResponder.collectAsState().value) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             title = { Text("Rescue Confirmation") },
@@ -71,7 +75,8 @@ fun MapScreen(
             confirmButton = {
                 TextButton(onClick = {
                     selectedMarker?.let { markerToRemove ->
-                        markers = markers.filter { it.lat != markerToRemove.lat || it.lng != markerToRemove.lng }
+                        markers =
+                            markers.filter { it.lat != markerToRemove.lat || it.lng != markerToRemove.lng }
                     }
 
                     showDialog = false

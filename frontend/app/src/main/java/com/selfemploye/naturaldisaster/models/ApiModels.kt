@@ -1,28 +1,70 @@
 package com.selfemploye.naturaldisaster.models
 
-data class SafeCounterResponse(
-    val total: Int,
-    val saved: Int,
-    val remaining: Int
-)
+// ======================
+// Tracking API
+// ======================
 
-data class MarkSafeRequest(
+// Requests
+data class SafeOrRespondRequest(
     val responderId: String,
     val userId: String,
     val responderLat: Double,
     val responderLon: Double
 )
 
+// Responses
+data class SuccessResponse(
+    val success: Boolean
+)
+
+data class RescueStatsResponse(
+    val totalUsers: Int,
+    val safeUsers: Int,
+    val rescuedUsers: Int
+)
+
+
+// ======================
+// Storms API
+// ======================
+
+// Responses
+data class StormUpdateResponse(
+    val success: Boolean,
+    val storms: List<Storm>
+)
+
+
+
+// ======================
+// Priorities API
+// ======================
+
+// Requests
+data class PriorityRequest(
+    val impactZones: List<ImpactZone>
+)
+
+// Responses
+data class PriorityResponse(
+    val priorityQueue: List<String>,
+    val affectedCount: Int
+)
+
+
+// ======================
+// Locations API
+// ======================
+
+// Requests
 data class UserLocationRequest(
     val userId: String,
     val lat: Double,
-    val lon: Double,
-    val danger: Int? = null
+    val lon: Double
 )
 
-data class PriorityUser(
-    val userId: String,
-    val lat: Double,
-    val lon: Double,
-    val danger: Int
+// Responses
+data class LocationUpdateResponse(
+    val message: String
 )
+
