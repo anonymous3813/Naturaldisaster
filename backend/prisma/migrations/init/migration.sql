@@ -1,0 +1,28 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- CreateTable
+CREATE TABLE [dbo].[UserLocation] (
+    [id] NVARCHAR(1000) NOT NULL,
+    [userId] NVARCHAR(1000) NOT NULL,
+    [lat] FLOAT(53) NOT NULL,
+    [lon] FLOAT(53) NOT NULL,
+    [timestamp] DATETIME2 NOT NULL CONSTRAINT [UserLocation_timestamp_df] DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT [UserLocation_pkey] PRIMARY KEY CLUSTERED ([id]),
+    CONSTRAINT [UserLocation_userId_key] UNIQUE NONCLUSTERED ([userId])
+);
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH
+

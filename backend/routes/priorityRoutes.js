@@ -1,5 +1,5 @@
 import express from 'express'
-import {getPriorityUsers, snapshot, updates} from '../controllers/priorityController'
+import {getPriorityUsers, snapshot, updates} from '../controllers/priorityController.js'
 
 const router = express.Router()
 

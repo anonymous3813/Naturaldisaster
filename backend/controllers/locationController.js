@@ -1,4 +1,4 @@
-import {saveUserLocation} from '../services/locationService'
+import {saveUserLocation} from '../services/locationService.js'
 
 export async function postLocation(req, res) {
     try {
