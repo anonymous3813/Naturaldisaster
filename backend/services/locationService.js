@@ -21,3 +21,8 @@ export function getPriorityUsers(topN = 10) {
 export async function getAllUserLocations() {
   return await prisma.userLocation.findMany();
 }
+
+export async function getAllUserLocations() {
+  return await prisma.UserLocation.findMany()
+}
+

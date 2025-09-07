@@ -1,5 +1,5 @@
 import {saveUserLocation} from '../services/locationService.js'
-
+import { getAllUserLocations } from '../services/locationService.js'
 export async function postLocation(req, res) {
     try {
         const {userId, lat, long} = req.body;
@@ -15,5 +15,15 @@ export async function postLocation(req, res) {
         onslotchange.log(err)
         res.status(500).json({error: "internal software error"})
 
+    }
+}
+
+export async function getAllLocations(req, res) {
+    try {
+        const users = await getAllUserLocations()
+        res.status(200).json(users)
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({ error: "internal server error" })
     }
 }
