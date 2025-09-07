@@ -60,9 +60,6 @@ export function parseGDACS(xmlString) {
 
 export async function getAzureImpactZones(lat, lon, severity = 1, stormName = '') {
   try {
-    // Get REAL impact zones from Azure Maps Weather Services using actual wind speed data
-    
-    // Get active tropical storms from Azure Maps
     const activeStormsRes = await axios.get(
       'https://atlas.microsoft.com/weather/tropical/storms/active/json',
       {
@@ -75,12 +72,12 @@ export async function getAzureImpactZones(lat, lon, severity = 1, stormName = ''
 
     const activeStorms = activeStormsRes.data.results || [];
     
-    // Find the closest active storm to our coordinates
+    
     let closestStorm = null;
     let minDistance = Infinity;
     
     for (const storm of activeStorms) {
-      // Get storm location data
+     
       const stormLocationRes = await axios.get(
         'https://atlas.microsoft.com/weather/tropical/storms/locations/json',
         {
@@ -114,18 +111,18 @@ export async function getAzureImpactZones(lat, lon, severity = 1, stormName = ''
     if (closestStorm && closestStorm.windSpeed > 0) {
       const impactZones = [];
       
-      // Create impact zones based on REAL wind speed data from Azure Maps
+      
       const windSpeed = closestStorm.windSpeed;
       const maxWindGust = closestStorm.maxWindGust;
       
-      // Create multiple impact zones based on wind speed thresholds
+      
       const windThresholds = [
         { speed: windSpeed * 0.8, radius: 50, name: 'Outer' },
         { speed: windSpeed * 0.9, radius: 30, name: 'Middle' },
         { speed: windSpeed, radius: 20, name: 'Inner' }
       ];
       
-      // Add max wind gust zone if significantly higher
+      
       if (maxWindGust > windSpeed * 1.2) {
         windThresholds.push({ speed: maxWindGust, radius: 15, name: 'Core' });
       }
@@ -158,7 +155,7 @@ export async function getAzureImpactZones(lat, lon, severity = 1, stormName = ''
       return impactZones;
     }
     
-    // If no real storm data available, return empty array
+    
     console.log(`No real storm data available for ${stormName}`);
     return [];
     
@@ -168,41 +165,39 @@ export async function getAzureImpactZones(lat, lon, severity = 1, stormName = ''
   }
 }
 
-// No simulated impact zones - only real data from Azure Maps
 
-// Helper function to create polygon from wind radius data
 function createWindRadiusPolygon(centerLat, centerLon, radiusKm, windSpeed) {
   const points = [];
-  const numPoints = 32; // More points for smoother circle
+  const numPoints = 32; 
   
   for (let i = 0; i < numPoints; i++) {
     const angle = (i * 360) / numPoints;
     const radians = (angle * Math.PI) / 180;
     
-    // Convert km to degrees (approximate)
+   
     const latOffset = (radiusKm / 111) * Math.cos(radians);
     const lonOffset = (radiusKm / (111 * Math.cos(centerLat * Math.PI / 180))) * Math.sin(radians);
     
     points.push([centerLon + lonOffset, centerLat + latOffset]);
   }
   
-  // Close the polygon
+  
   points.push(points[0]);
   return points;
 }
 
-// Helper function to convert wind speed to severity
+
 function getSeverityFromWindSpeed(windSpeed) {
-  if (windSpeed >= 74) return 5; // Hurricane force
-  if (windSpeed >= 64) return 4; // Tropical storm
-  if (windSpeed >= 39) return 3; // Tropical depression
-  if (windSpeed >= 25) return 2; // Strong winds
+  if (windSpeed >= 74) return 5; 
+  if (windSpeed >= 64) return 4; 
+  if (windSpeed >= 39) return 3; 
+  if (windSpeed >= 25) return 2; 
   return 1; // Light winds
 }
 
-// Helper function to calculate distance between two points
+
 function getDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371; // Earth's radius in km
+  const R = 6371; 
   const dLat = deg2rad(lat2 - lat1);
   const dLon = deg2rad(lon2 - lon1);
   const a =
@@ -222,7 +217,6 @@ export async function getStormsWithZones() {
   const disasters = parseGDACS(disasterResponse.data);
 
   for (const storm of disasters) {
-    // Try to get GDACS polygon data (only if we have a valid ID)
     try {
       if (!storm.id || storm.id === 'unknown') {
         console.log(`Skipping GDACS polygon for storm ${storm.name} - invalid ID: ${storm.id}`);
@@ -236,7 +230,7 @@ export async function getStormsWithZones() {
       storm.zone = null;
     }
 
-    // Always create impact zones (regardless of GDACS ID validity)
+   
     try {
       const impactZones = await getAzureImpactZones(storm.lat, storm.lon, storm.severity, storm.name);
       storm.impactZones = impactZones;
@@ -250,7 +244,7 @@ export async function getStormsWithZones() {
       data: {
         lat: storm.lat,
         lon: storm.lon,
-        radius: 100, // Default radius in km
+        radius: 100, 
         severity: storm.severity
       }
     });
