@@ -16,10 +16,8 @@ export async function flagUsersInStorm(impactZones) {
       let danger = 0;
       let inHighImpactZone = false;
 
-      
       for (const zone of impactZones) {
         if (pointInPolygon([user.lat, user.lon], zone.polygon.coordinates[0])) {
-          
           if (zone.severity >= 3) {
             inHighImpactZone = true;
             danger = zone.severity * 100;
@@ -28,7 +26,6 @@ export async function flagUsersInStorm(impactZones) {
         }
       }
 
-    
       if (inHighImpactZone) {
         priorityQueue.push({ ...user, danger });
       }
@@ -43,7 +40,6 @@ export async function alertUsers(users) {
   }
 }
 
-// Haversine distance
 export function getDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
   const dLat = deg2rad(lat2 - lat1);

@@ -1,6 +1,5 @@
 import { markUserSafe, respondToUser, getRescueStats } from '../services/trackingService.js';
 
-
 export const markUserSafeController = async (req, res) => {
   try {
     const { responderId, userId, responderLat, responderLon } = req.body;
@@ -12,7 +11,6 @@ export const markUserSafeController = async (req, res) => {
   }
 };
 
-
 export const respondToUserController = async (req, res) => {
   try {
     const { responderId, userId, responderLat, responderLon } = req.body;
@@ -23,7 +21,6 @@ export const respondToUserController = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 
 export const getCounterController = async (req, res) => {
   try {

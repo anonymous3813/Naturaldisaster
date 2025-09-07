@@ -40,7 +40,6 @@ export function parseGDACS(xmlString) {
       if (match) severity = parseInt(match[1]);
     }
 
-    // Extract ID properly from XML structure
     let stormId = 'unknown';
     if (item.guid) {
       stormId = typeof item.guid === 'string' ? item.guid : (item.guid._text || item.guid.text || 'unknown');
@@ -72,12 +71,10 @@ export async function getAzureImpactZones(lat, lon, severity = 1, stormName = ''
 
     const activeStorms = activeStormsRes.data.results || [];
     
-    
     let closestStorm = null;
     let minDistance = Infinity;
     
     for (const storm of activeStorms) {
-     
       const stormLocationRes = await axios.get(
         'https://atlas.microsoft.com/weather/tropical/storms/locations/json',
         {
@@ -95,7 +92,7 @@ export async function getAzureImpactZones(lat, lon, severity = 1, stormName = ''
         const stormLocation = stormLocationRes.data.results[0];
         const distance = getDistance(lat, lon, stormLocation.location.latitude, stormLocation.location.longitude);
         
-        if (distance < minDistance && distance < 1000) { // Within 1000km
+        if (distance < minDistance && distance < 1000) {
           minDistance = distance;
           closestStorm = {
             ...storm,
@@ -111,17 +108,14 @@ export async function getAzureImpactZones(lat, lon, severity = 1, stormName = ''
     if (closestStorm && closestStorm.windSpeed > 0) {
       const impactZones = [];
       
-      
       const windSpeed = closestStorm.windSpeed;
       const maxWindGust = closestStorm.maxWindGust;
-      
       
       const windThresholds = [
         { speed: windSpeed * 0.8, radius: 50, name: 'Outer' },
         { speed: windSpeed * 0.9, radius: 30, name: 'Middle' },
         { speed: windSpeed, radius: 20, name: 'Inner' }
       ];
-      
       
       if (maxWindGust > windSpeed * 1.2) {
         windThresholds.push({ speed: maxWindGust, radius: 15, name: 'Core' });
@@ -155,7 +149,6 @@ export async function getAzureImpactZones(lat, lon, severity = 1, stormName = ''
       return impactZones;
     }
     
-    
     console.log(`No real storm data available for ${stormName}`);
     return [];
     
@@ -174,13 +167,11 @@ function createWindRadiusPolygon(centerLat, centerLon, radiusKm, windSpeed) {
     const angle = (i * 360) / numPoints;
     const radians = (angle * Math.PI) / 180;
     
-   
     const latOffset = (radiusKm / 111) * Math.cos(radians);
     const lonOffset = (radiusKm / (111 * Math.cos(centerLat * Math.PI / 180))) * Math.sin(radians);
     
     points.push([centerLon + lonOffset, centerLat + latOffset]);
   }
-  
   
   points.push(points[0]);
   return points;
@@ -192,7 +183,7 @@ function getSeverityFromWindSpeed(windSpeed) {
   if (windSpeed >= 64) return 4; 
   if (windSpeed >= 39) return 3; 
   if (windSpeed >= 25) return 2; 
-  return 1; // Light winds
+  return 1;
 }
 
 
@@ -230,7 +221,6 @@ export async function getStormsWithZones() {
       storm.zone = null;
     }
 
-   
     try {
       const impactZones = await getAzureImpactZones(storm.lat, storm.lon, storm.severity, storm.name);
       storm.impactZones = impactZones;

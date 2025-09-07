@@ -7,7 +7,7 @@ export async function markUserSafe(responderId, userId, responderLat, responderL
   const user = await prisma.userLocation.findUnique({ where: { userId } });
   if (!user) throw new Error('User not found');
 
-  const radiusKm = radiusFeet * 0.0003048; 
+  const radiusKm = radiusFeet * 0.0003048;
   const distance = getDistance(responderLat, responderLon, user.lat, user.lon);
 
   if (distance <= radiusKm) {
@@ -30,7 +30,6 @@ export async function respondToUser(responderId, userId, responderLat, responder
   const distance = getDistance(responderLat, responderLon, user.lat, user.lon);
 
   if (distance <= radiusKm) {
-    
     return { success: true, userId: user.userId, distanceKm: distance };
   }
 
@@ -46,8 +45,8 @@ export async function getRescueStats() {
     totalUsers,
     safeUsers,
     atRiskUsers,
-    activeResponders: 0, // This would need to be tracked separately
-    rescueAttempts: 0    // This would need to be tracked separately
+    activeResponders: 0,
+    rescueAttempts: 0
   };
 }
 
