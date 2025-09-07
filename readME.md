@@ -1,4 +1,5 @@
 Natural Disaster App
+-------------------------------------------
 
 description
 -------------------------------------------
@@ -11,4 +12,5 @@ User selects whether they are a civilian or a first responder. Civilians don't h
 technologies
 -------------------------------------------
 Kotlin Jetpack Compose, backend Express JS
+
 
