@@ -42,6 +42,7 @@ import androidx.navigation.navArgument
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.selfemploye.naturaldisaster.models.Screens
+import com.selfemploye.naturaldisaster.ui.components.LocationPermissionHandler
 import com.selfemploye.naturaldisaster.ui.screens.MapScreen
 import com.selfemploye.naturaldisaster.ui.screens.SettingsScreen
 import com.selfemploye.naturaldisaster.ui.screens.TrackingScreen
@@ -117,10 +118,14 @@ fun NaturalDisasterApp(
             startDestination = Screens.Map.route,
             modifier = Modifier.padding(contentPadding)
         ) {
-            composable(Screens.Map.route) { MapScreen(appViewModel, navController) }
-            composable(Screens.Tracking.route) { TrackingScreen(appViewModel, navController) }
-            composable(Screens.Settings.route) { SettingsScreen(appViewModel, navController) }
+            composable(Screens.Map.route) { MapScreen(appViewModel) }
+            composable(Screens.Tracking.route) { TrackingScreen(appViewModel ) }
+            composable(Screens.Settings.route) { SettingsScreen(appViewModel) }
         }
+    }
+
+    LocationPermissionHandler {
+        appViewModel.startLocationUpdates()
     }
 }
 

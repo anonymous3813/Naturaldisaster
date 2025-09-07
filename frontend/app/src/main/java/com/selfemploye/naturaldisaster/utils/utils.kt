@@ -11,25 +11,22 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 
 @SuppressLint("MissingPermission")
-fun getLastLocation(context: Context, callback: (Double, Double) -> Unit) {
-    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
+fun getLastLocation(context: Context, callback: (Double?, Double?) -> Unit) {
+    val fusedLocationClient: FusedLocationProviderClient =
+        LocationServices.getFusedLocationProviderClient(context)
 
-    // Create a one-time high accuracy request
-    val locationRequest = LocationRequest.Builder(
-        Priority.PRIORITY_HIGH_ACCURACY,
-        1000L // 1 second interval (we just want 1 update)
-    ).setMaxUpdates(1) // Only need one location
+    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000L)
+        .setMaxUpdates(1)
         .build()
 
     val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
             val location = result.lastLocation
-            location?.let {
-                callback(it.latitude, it.longitude)
-            } ?: run {
-                callback(0.0, 0.0) // fallback if still null
+            if (location != null) {
+                callback(location.latitude, location.longitude)
+            } else {
+                callback(null, null)
             }
-            // Stop updates after getting one location
             fusedLocationClient.removeLocationUpdates(this)
         }
     }

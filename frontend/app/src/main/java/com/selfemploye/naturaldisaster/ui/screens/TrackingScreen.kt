@@ -18,41 +18,11 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.selfemploye.naturaldisaster.utils.getLastLocation
 import com.selfemploye.naturaldisaster.viewmodel.AppViewModel
+import androidx.compose.runtime.collectAsState
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun TrackingScreen(appViewModel: AppViewModel, navController: NavController, modifier: Modifier = Modifier) {
-
+fun TrackingScreen(appViewModel: AppViewModel) {
     val context = LocalContext.current
-    var locationText by remember { mutableStateOf("Getting location...") }
 
-    val permissionState = rememberPermissionState(android.Manifest.permission.ACCESS_FINE_LOCATION)
-
-    LaunchedEffect(Unit) {
-        if (permissionState.status.equals(true)) {
-            getLastLocation(context) { lat, lng ->
-                locationText = if (lat != 0.0 && lng != 0.0) {
-                    "Location received: Lat $lat, Lng $lng"
-                } else {
-                    "Failed to get location"
-                }
-            }
-        } else {
-            permissionState.launchPermissionRequest()
-        }
-    }
-
-
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(locationText)
-        Text("Last recorded location: 1.3521, 103.8198")
-        Text("Updates will continue in background...")
-    }
+    Text(text = "Latitude: ${appViewModel.lastLocation.collectAsState().value.lat}, Longitude: ${appViewModel.lastLocation.collectAsState().value.lng}")
 }
-

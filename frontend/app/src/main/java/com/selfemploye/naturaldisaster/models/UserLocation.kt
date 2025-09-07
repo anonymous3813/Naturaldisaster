@@ -1,3 +1,21 @@
 package com.selfemploye.naturaldisaster.models
 
-data class UserLocation(val lat: Double, val lng: Double)
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+
+data class UserLocation(
+    val lat: Double,
+    val lng: Double,
+    val urgency: Int
+) {
+    fun getMarkerColor(): Float {
+        return when (urgency) {
+            1 -> BitmapDescriptorFactory.HUE_GREEN
+            2 -> BitmapDescriptorFactory.HUE_YELLOW
+            3 -> BitmapDescriptorFactory.HUE_ORANGE
+            4 -> BitmapDescriptorFactory.HUE_ROSE
+            5 -> BitmapDescriptorFactory.HUE_RED
+            else -> BitmapDescriptorFactory.HUE_BLUE
+        }
+    }
+
+}
