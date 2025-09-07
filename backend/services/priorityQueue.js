@@ -7,29 +7,32 @@ const prisma = new PrismaClient();
 
 export const priorityQueue = new Heap((a, b) => b.danger - a.danger);
 
-export async function flagUsersInStorm(storm) {
-  const { lat, lon, radius, severity } = storm;
-
+export async function flagUsersInStorm(impactZones) {
   const users = await prisma.userLocation.findMany();
-  const azureZones = await getAzureImpactZones(lat, lon);
 
   priorityQueue.clear();
 
-  for (const user of users) {
-    const distance = getDistance(lat, lon, user.lat, user.lon);
+    for (const user of users) {
+      let danger = 0;
+      let inHighImpactZone = false;
 
-    if (distance > radius) continue;
+      
+      for (const zone of impactZones) {
+        if (pointInPolygon([user.lat, user.lon], zone.polygon.coordinates[0])) {
+          
+          if (zone.severity >= 3) {
+            inHighImpactZone = true;
+            danger = zone.severity * 100;
+            break; 
+          }
+        }
+      }
 
-    let danger = (1 - distance / radius) * severity * 100;
-
-    for (const zone of azureZones) {
-      if (pointInPolygon([user.lat, user.lon], zone.polygon)) {
-        danger *= 1.5; 
+    
+      if (inHighImpactZone) {
+        priorityQueue.push({ ...user, danger });
       }
     }
-
-    priorityQueue.push({ ...user, distance, danger });
-  }
 
   return priorityQueue.toArray().slice(0, 50);
 }

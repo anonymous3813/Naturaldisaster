@@ -2,7 +2,6 @@ import axios from 'axios';
 import { PrismaClient } from '@prisma/client';
 import { XMLParser } from 'fast-xml-parser';
 import * as turf from '@turf/turf';
-import { buildPriorityQueue } from './priorityQueue.js';
 import { createAlert } from './notificationService.js';
 
 const prisma = new PrismaClient();
@@ -108,25 +107,6 @@ export async function getStormsWithZones() {
       }
     });
 
-    const users = await prisma.userLocation.findMany({ where: { safe: false } });
-    const affectedUsers = users.filter(u => {
-      let inside = false;
-      if (storm.zone) inside = pointInPolygon([u.lat, u.lon], storm.zone);
-      for (const z of impactZones) {
-        if (pointInPolygon([u.lat, u.lon], z.polygon)) inside = true;
-      }
-      return inside;
-    });
-
-    const pq = buildPriorityQueue(affectedUsers);
-    for (const user of pq) {
-      await createAlert(
-        user.userId,
-        `🚨 ${storm.name} approaching. Evacuate or take cover immediately!`
-      );
-    }
-
-    storm.priorityQueue = pq;
   }
 
   return disasters;

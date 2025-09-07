@@ -1,12 +1,10 @@
-import { flagUsersInStorm, buildPriorityQueue, alertUsers, priorityQueue } from '../services/priorityQueue.js';
+import { flagUsersInStorm, alertUsers, priorityQueue } from '../services/priorityQueue.js';
 
 export const getPriorityUsers = async (req, res) => {
   try {
-    const storm = req.body; 
+    const { impactZones } = req.body; 
 
-    const affectedUsers = await flagUsersInStorm(storm);
-
-    buildPriorityQueue(affectedUsers); 
+    const affectedUsers = await flagUsersInStorm(impactZones);
 
     await alertUsers(affectedUsers);
 
