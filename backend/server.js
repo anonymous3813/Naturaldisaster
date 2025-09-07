@@ -24,6 +24,6 @@ app.use('/api/track', trackingRoutes)
 app.get('/', (req, res) => res.send('Backend Running'));
 
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`Server is running on port ${PORT}`);
 });
