@@ -1,10 +1,8 @@
-import express from 'express'
-import {getStorms} from '../controllers/stormController.js'
-import {getSnapshot} from '../controllers/stormController.js'
+import express from 'express';
+import { updateStorms } from '../controllers/stormController.js';
 
-const router = express.Router()
+const router = express.Router();
 
-router.post('/', getStorms)
-router.post('/snapshot', getSnapshot)
+router.get('/update', updateStorms);
 
 export default router;

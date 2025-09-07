@@ -1,11 +1,8 @@
-import express from 'express'
-import {getPriorityUsers, snapshot, updates} from '../controllers/priorityController.js'
+import express from 'express';
+import { getPriorityUsers } from '../controllers/priorityController.js';
 
-const router = express.Router()
+const router = express.Router();
 
-router.post('/', getPriorityUsers)
-router.post('/', snapshot)
-router.post('/', updates)
-
+router.post('/', getPriorityUsers);
 
 export default router;

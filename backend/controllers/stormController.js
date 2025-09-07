@@ -1,20 +1,26 @@
 import { getStormsWithZones } from '../services/stormService.js';
-import { getAllUserLocations } from '../services/locationService.js';
+import { flagUsersInStorm, buildPriorityQueue, alertUsers } from '../services/priorityQueue.js';
 
-export async function getStorms(req, res) {
+export const updateStorms = async (req, res) => {
   try {
+   
     const storms = await getStormsWithZones();
-    res.json(storms);
-  } catch (err) {
-    res.status(500).send('Error fetching storms');
-  }
-}
 
-export async function getSnapshot(req, res) {
-  try {
-    const users = await getAllUserLocations();
-    res.json(users);
+    
+    for (const storm of storms) {
+      const affectedUsers = await flagUsersInStorm(storm);
+      const pq = buildPriorityQueue(affectedUsers);
+
+      
+      await alertUsers(affectedUsers);
+
+      
+      console.log(`Storm ${storm.title} affected ${affectedUsers.length} users`);
+    }
+
+    res.json({ success: true, storms });
   } catch (err) {
-    res.status(500).send('Error fetching snapshot');
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update storms' });
   }
-}
+};

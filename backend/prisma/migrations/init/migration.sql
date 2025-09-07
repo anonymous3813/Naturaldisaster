@@ -1,28 +1,40 @@
 BEGIN TRY
-
 BEGIN TRAN;
 
--- CreateTable
-CREATE TABLE [dbo].[UserLocation] (
-    [id] NVARCHAR(1000) NOT NULL,
-    [userId] NVARCHAR(1000) NOT NULL,
-    [lat] FLOAT(53) NOT NULL,
-    [lon] FLOAT(53) NOT NULL,
-    [timestamp] DATETIME2 NOT NULL CONSTRAINT [UserLocation_timestamp_df] DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT [UserLocation_pkey] PRIMARY KEY CLUSTERED ([id]),
-    CONSTRAINT [UserLocation_userId_key] UNIQUE NONCLUSTERED ([userId])
-);
+-- Create Storms table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Storms' AND xtype='U')
+BEGIN
+    CREATE TABLE [dbo].[Storms] (
+        [id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        [externalId] NVARCHAR(255) NOT NULL,
+        [title] NVARCHAR(255) NOT NULL,
+        [lat] FLOAT NOT NULL,
+        [lon] FLOAT NOT NULL,
+        [radiusKm] FLOAT NOT NULL,
+        [createdAt] DATETIME2 NOT NULL DEFAULT GETDATE()
+    );
+END;
+
+-- Create Notifications table
+IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='Notifications' AND xtype='U')
+BEGIN
+    CREATE TABLE [dbo].[Notifications] (
+        [id] INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        [userId] NVARCHAR(255) NOT NULL,
+        [message] NVARCHAR(1000) NOT NULL,
+        [delivered] BIT NOT NULL DEFAULT 0,
+        [createdAt] DATETIME2 NOT NULL DEFAULT GETDATE()
+    );
+END;
+
+-- (You already have UserLocations so we won’t recreate it)
 
 COMMIT TRAN;
-
 END TRY
 BEGIN CATCH
-
-IF @@TRANCOUNT > 0
-BEGIN
-    ROLLBACK TRAN;
-END;
-THROW
-
-END CATCH
-
+    IF @@TRANCOUNT > 0
+    BEGIN
+        ROLLBACK TRAN;
+    END;
+    THROW;
+END CATCH;
