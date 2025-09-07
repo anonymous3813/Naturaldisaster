@@ -31,7 +31,7 @@ export async function createAlert(userId, message) {
         userId,
         message,
         timestamp: new Date(),
-        status: 'pending',
+        read: false,
       },
     });
 
