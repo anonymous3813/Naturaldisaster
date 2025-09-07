@@ -7,7 +7,7 @@ export async function postLocation(req, res) {
             return res.status(400).json({error: "Need all data to continue"})
         }
 
-        await saveUserLocation(userId, lat, lon)
+        await saveUserLocation(userId, lon, lat)
         return res.status(200).json({message: 'location updated'})
 
     }
