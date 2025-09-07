@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.selfemploye.naturaldisaster.data.RetrofitInstance
+import com.selfemploye.naturaldisaster.ui.components.ExportButton
+import com.selfemploye.naturaldisaster.utils.saveCSVToDevice
 import com.selfemploye.naturaldisaster.viewmodel.AppViewModel
 
 @Composable
@@ -88,4 +92,6 @@ fun TrackingScreen(appViewModel: AppViewModel) {
             }
         }
     }
+
+    ExportButton()
 }

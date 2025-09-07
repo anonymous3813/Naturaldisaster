@@ -9,6 +9,7 @@ import com.selfemploye.naturaldisaster.models.StormUpdateResponse
 import com.selfemploye.naturaldisaster.models.SuccessResponse
 import com.selfemploye.naturaldisaster.models.UserLocation
 import com.selfemploye.naturaldisaster.models.UserLocationRequest
+import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -43,4 +44,7 @@ interface ApiService {
 
     @GET("api/locations/get")
     suspend fun getAllLocations(): Response<List<UserLocation>>
+
+    @GET("api/locations/export-csv")
+    suspend fun getExportedLocations(): Response<ResponseBody>
 }

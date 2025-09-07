@@ -1,0 +1,33 @@
+{
+  "storms": [
+    {
+      "id": "unknown",
+      "name": "Orange alert for tropical cyclone TAPAH-25. Population affected by Category 1 (120 km/h) wind speeds or higher is 2.83 million .",
+      "lat": 20.0,
+      "lon": 113.6,
+      "severity": 1,
+      "zone": null,
+      "impactZones": [
+        {
+          "polygon": {
+            "type": "Polygon",
+            "coordinates": [
+              [
+                [113.2, 21.25045045045045],
+                [113.29400525215512, 21.241795171352805]
+              ]
+            ]
+          },
+          "severity": 5,
+          "radius": 50,
+          "windSpeed": 88.88,
+          "type": "wind",
+          "source": "azure_maps_real_wind_data",
+          "stormId": "NP22",
+          "stormName": "TAPAH",
+          "zoneName": "Outer"
+        }
+      ]
+    }
+  ]
+}

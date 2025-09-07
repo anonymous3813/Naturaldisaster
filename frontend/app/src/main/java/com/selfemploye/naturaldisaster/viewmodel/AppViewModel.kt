@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Looper
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.selfemploye.naturaldisaster.data.ApiService
 import com.selfemploye.naturaldisaster.data.RetrofitInstance
 import com.selfemploye.naturaldisaster.data.UserPrefs
 import com.selfemploye.naturaldisaster.data.dataStore
@@ -46,10 +48,14 @@ class AppViewModel(
     private val _allLocations = MutableStateFlow<List<UserLocation>>(emptyList())
     val allLocations: StateFlow<List<UserLocation>> = _allLocations
 
+    private val _allStorms = MutableStateFlow<List<Storm>>(emptyList())
+    val allStorms: StateFlow<List<Storm>> = _allStorms
+
     init {
         viewModelScope.launch {
             _userId.value = getOrCreateUserId()
             fetchAllLocations()
+            fetchAllStorms()
             Log.d("View model location fetch", allLocations.value.toString())
         }
     }
@@ -189,6 +195,20 @@ class AppViewModel(
             } catch (e: Exception) {
                 Log.e("API", "Failed to fetch counter: ${e.message}")
             }
+        }
+    }
+
+    private suspend fun fetchAllStorms() {
+        try {
+            val response = RetrofitInstance.api.getStormUpdates()
+            if (response.isSuccessful && response.body() != null) {
+                _allStorms.value = response.body()?.storms!!
+                Log.d("API storms worked", response.body().toString())
+            } else {
+                Log.d("API storms failed", response.body().toString())
+            }
+        } catch (e: Exception) {
+            Log.e("API storms", "Exception fetching all storms: ${e.message}")
         }
     }
 
