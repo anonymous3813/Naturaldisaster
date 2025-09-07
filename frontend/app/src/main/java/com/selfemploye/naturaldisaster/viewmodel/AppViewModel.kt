@@ -50,6 +50,7 @@ class AppViewModel(
     init {
         viewModelScope.launch {
             _userId.value = getOrCreateUserId()
+            fetchAllLocations()
         }
     }
 
@@ -170,7 +171,14 @@ class AppViewModel(
             try {
                 val response = RetrofitInstance.api.getAllLocations()
                 if(response.isSuccessful) {
-                    _allLocations.value = response.body()!!
+                    if (response.body() != null) {
+                        _allLocations.value = response.body()!!
+                        Log.d("API worked",response.body().toString())
+                    } else {
+                        Log.d("API failed",response.body().toString())
+                    }
+
+
                 }
             } catch (e: Exception) {
                 Log.e("API", "Exception fetching all locations: ${e.message}")

@@ -23,7 +23,6 @@ data class RescueStatsResponse(
     val rescuedUsers: Int
 )
 
-
 // ======================
 // Storms API
 // ======================
@@ -33,8 +32,6 @@ data class StormUpdateResponse(
     val success: Boolean,
     val storms: List<Storm>
 )
-
-
 
 // ======================
 // Priorities API

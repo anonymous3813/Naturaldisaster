@@ -1,10 +1,12 @@
 package com.selfemploye.naturaldisaster.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,20 +27,14 @@ import com.selfemploye.naturaldisaster.viewmodel.AppViewModel
 fun MapScreen(
     appViewModel: AppViewModel
 ) {
-    val startingLocation = LatLng(
-        appViewModel.lastLocation.collectAsState().value.lat,
-        appViewModel.lastLocation.collectAsState().value.lng
-    )
+    val lastLocation by appViewModel.lastLocation.collectAsState()
+    val startingLocation = remember(lastLocation) {
+        LatLng(lastLocation.lat, lastLocation.lng)
+    }
 
     var markers by remember {
         mutableStateOf(
-            listOf(
-                UserLocation(37.7749, -122.4194, 5), // San Francisco
-                UserLocation(37.8044, -122.2711, 4), // Oakland
-                UserLocation(37.6879, -122.4702, 3), // Daly City
-                UserLocation(37.8715, -122.2730, 2), // Berkeley
-                UserLocation(37.3382, -121.8863, 1)  // San Jose
-            )
+            appViewModel.allLocations.value
         )
     }
 
@@ -77,6 +73,7 @@ fun MapScreen(
                     selectedMarker?.let { markerToRemove ->
                         markers =
                             markers.filter { it.lat != markerToRemove.lat || it.lng != markerToRemove.lng }
+
                     }
 
                     showDialog = false
