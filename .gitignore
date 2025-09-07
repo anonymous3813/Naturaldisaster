@@ -1,2 +1,14 @@
 /.gradle
-/backend/node_modules
+
+
+# Node modules
+**/node_modules/
+
+# Env files
+**/.env
+
+# VSCode
+.vscode/
+
+# MacOS
+.DS_Store
