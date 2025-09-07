@@ -1,9 +1,12 @@
 package com.selfemploye.naturaldisaster.data
 
-import com.selfemploye.naturaldisaster.models.MarkSafeRequest
+import com.selfemploye.naturaldisaster.models.LocationUpdateResponse
+import com.selfemploye.naturaldisaster.models.PriorityRequest
 import com.selfemploye.naturaldisaster.models.PriorityResponse
-import com.selfemploye.naturaldisaster.models.PriorityUser
-import com.selfemploye.naturaldisaster.models.SafeCounterResponse
+import com.selfemploye.naturaldisaster.models.RescueStatsResponse
+import com.selfemploye.naturaldisaster.models.SafeOrRespondRequest
+import com.selfemploye.naturaldisaster.models.StormUpdateResponse
+import com.selfemploye.naturaldisaster.models.SuccessResponse
 import com.selfemploye.naturaldisaster.models.UserLocation
 import com.selfemploye.naturaldisaster.models.UserLocationRequest
 import retrofit2.Response
@@ -13,15 +16,31 @@ import retrofit2.http.POST
 
 interface ApiService {
 
-    @GET("api/tracking/counter")
-    suspend fun getSafeCounter(): Response<SafeCounterResponse>
+    //Tracking
+    @POST("api/track/safe")
+    suspend fun markUserSafe(@Body request: SafeOrRespondRequest): Response<SuccessResponse>
 
-    @POST("api/tracking/safe")
-    suspend fun markUserSafe(@Body request: MarkSafeRequest): Response<Unit>
+    @POST("api/track/respond")
+    suspend fun respondToUser(@Body request: SafeOrRespondRequest): Response<SuccessResponse>
 
-    @POST("api/locations")
-    suspend fun postLocation(@Body location: UserLocationRequest): Response<Unit>
+    @GET("api/track/counter")
+    suspend fun getRescueStats(): Response<RescueStatsResponse>
 
-    @GET("api/priorities")
-    suspend fun getPriorities(): Response<List<PriorityUser>>
+
+    //Storms
+    @GET("api/storms/update")
+    suspend fun getStormUpdates(): Response<StormUpdateResponse>
+
+
+    //Priorities
+    @POST("api/priorities")
+    suspend fun getPriorityUsers(@Body request: PriorityRequest): Response<PriorityResponse>
+
+
+    //Locations
+    @POST("api/locations/post")
+    suspend fun postLocation(@Body request: UserLocationRequest): Response<LocationUpdateResponse>
+
+    @GET("api/locations/get")
+    suspend fun getAllLocations(): Response<List<UserLocation>>
 }

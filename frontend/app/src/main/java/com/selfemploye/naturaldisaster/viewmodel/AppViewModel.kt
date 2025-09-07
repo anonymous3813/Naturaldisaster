@@ -12,6 +12,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.selfemploye.naturaldisaster.data.ApiService
 import com.selfemploye.naturaldisaster.data.RetrofitInstance
 import com.selfemploye.naturaldisaster.data.UserPrefs
 import com.selfemploye.naturaldisaster.data.dataStore
@@ -42,6 +43,9 @@ class AppViewModel(
 
     private val _remainingCounter = MutableStateFlow<Int?>(null)
     val remainingCounter: StateFlow<Int?> = _remainingCounter
+
+    private val _allLocations = MutableStateFlow<List<UserLocation>>(emptyList())
+    val allLocations: StateFlow<List<UserLocation>> = _allLocations
 
     init {
         viewModelScope.launch {
@@ -107,6 +111,7 @@ class AppViewModel(
         })
     }
 
+    //Set local data
     fun setIsFirstResponder(newValue: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             dataStore.edit { prefs ->
@@ -123,23 +128,36 @@ class AppViewModel(
         }
     }
 
+    //Set cloud db data
     fun setLastLocation(newValue: UserLocation) {
         viewModelScope.launch(Dispatchers.IO) {
             dataStore.edit { prefs ->
                 prefs[UserPrefs.LAST_LAT] = newValue.lat
                 prefs[UserPrefs.LAST_LON] = newValue.lng
             }
-
+            try {
+                val response = RetrofitInstance.api.postLocation(
+                    UserLocationRequest(
+                        userId = userId.value ?: getOrCreateUserId(),
+                        lat = lastLocation.value.lat,
+                        lon = lastLocation.value.lng
+                    )
+                )
+            } catch (e: Exception) {
+                Log.e("API", "Failed to set last location ${e.message}")
+            }
         }
     }
 
+    //API methods
+
     fun fetchStats() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.getSafeCounter()
+                val response = RetrofitInstance.api.getRescueStats()
                 if (response.isSuccessful) {
-                    _safeCounter.value = response.body()?.saved
-                    _remainingCounter.value = response.body()?.remaining
+                    _safeCounter.value = response.body()?.safeUsers
+                    _remainingCounter.value = response.body()?.rescuedUsers
                 }
             } catch (e: Exception) {
                 Log.e("API", "Failed to fetch counter: ${e.message}")
@@ -147,16 +165,18 @@ class AppViewModel(
         }
     }
 
-    fun markUserSafe(request: MarkSafeRequest) {
-        viewModelScope.launch {
+    fun fetchAllLocations() {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                val response = RetrofitInstance.api.markUserSafe(request)
-                if (!response.isSuccessful) {
-                    Log.e("API", "Failed to mark safe: ${response.code()}")
+                val response = RetrofitInstance.api.getAllLocations()
+                if(response.isSuccessful) {
+                    _allLocations.value = response.body()!!
                 }
             } catch (e: Exception) {
-                Log.e("API", "Exception marking safe: ${e.message}")
+                Log.e("API", "Exception fetching all locations: ${e.message}")
             }
         }
     }
+
+
 }
