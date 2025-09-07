@@ -1,6 +1,7 @@
-import { markUserSafe, getRescueStats } from '../services/trackingService.js';
+import { markUserSafe, respondToUser, getRescueStats } from '../services/trackingService.js';
 
-export const respondToUser = async (req, res) => {
+// POST /api/tracking/safe
+export const markUserSafeController = async (req, res) => {
   try {
     const { responderId, userId, responderLat, responderLon } = req.body;
     const success = await markUserSafe(responderId, userId, responderLat, responderLon);
@@ -11,7 +12,20 @@ export const respondToUser = async (req, res) => {
   }
 };
 
-export const getCounter = async (req, res) => {
+// POST /api/tracking/respond
+export const respondToUserController = async (req, res) => {
+  try {
+    const { responderId, userId, responderLat, responderLon } = req.body;
+    const success = await respondToUser(responderId, userId, responderLat, responderLon);
+    res.json({ success });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/tracking/counter
+export const getCounterController = async (req, res) => {
   try {
     const stats = await getRescueStats();
     res.json(stats);
