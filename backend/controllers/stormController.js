@@ -1,24 +1,21 @@
 import { getStormsWithZones } from '../services/stormService.js';
-import { flagUsersInStorm, buildPriorityQueue, alertUsers } from '../services/priorityQueue.js';
+import { alertUsers } from '../services/notificationService.js';
 
 export const updateStorms = async (req, res) => {
   try {
-   
     const storms = await getStormsWithZones();
 
-    
     for (const storm of storms) {
-      const affectedUsers = await flagUsersInStorm(storm);
-      const pq = buildPriorityQueue(affectedUsers);
-
-      
-      await alertUsers(affectedUsers);
-
-      
-      console.log(`Storm ${storm.title} affected ${affectedUsers.length} users`);
+      if (storm.priorityQueue && storm.priorityQueue.length > 0) {
+        await alertUsers(storm.priorityQueue);
+      }
+      console.log(`Storm ${storm.name} affected ${storm.priorityQueue?.length || 0} users`);
     }
 
-    res.json({ success: true, storms });
+    res.status(200).json({
+      success: true,
+      storms
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Failed to update storms' });

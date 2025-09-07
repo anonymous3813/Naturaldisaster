@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/locations', locationRoutes);
 app.use('/api/storms', stormRoutes);
 app.use('/api/priorities', priorityRoutes);
-app.use('api/track', trackingRoutes)
+app.use('/api/track', trackingRoutes)
 
 
 app.get('/', (req, res) => res.send('Backend Running'));

@@ -1,6 +1,6 @@
 import { markUserSafe, respondToUser, getRescueStats } from '../services/trackingService.js';
 
-// POST /api/tracking/safe
+
 export const markUserSafeController = async (req, res) => {
   try {
     const { responderId, userId, responderLat, responderLon } = req.body;
@@ -12,7 +12,7 @@ export const markUserSafeController = async (req, res) => {
   }
 };
 
-// POST /api/tracking/respond
+
 export const respondToUserController = async (req, res) => {
   try {
     const { responderId, userId, responderLat, responderLon } = req.body;
@@ -24,7 +24,7 @@ export const respondToUserController = async (req, res) => {
   }
 };
 
-// GET /api/tracking/counter
+
 export const getCounterController = async (req, res) => {
   try {
     const stats = await getRescueStats();

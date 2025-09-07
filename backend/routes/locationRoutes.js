@@ -1,5 +1,5 @@
 import express from 'express'
-import {postLocation} from '../controllers/locationController.js'
+import {postLocation, getAllLocations} from '../controllers/locationController.js'
 
 const router = express.Router()
 

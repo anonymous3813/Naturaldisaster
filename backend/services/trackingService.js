@@ -7,7 +7,7 @@ export async function markUserSafe(responderId, userId, responderLat, responderL
   if (!user) throw new Error('User not found');
 
   const radiusKm = radiusFeet * 0.0003048; 
-  const distance = getDistance(responderLat, responderLon, user.lat, user.long);
+  const distance = getDistance(responderLat, responderLon, user.lat, user.lon);
 
   if (distance <= radiusKm) {
     const updatedUser = await prisma.userLocation.update({
@@ -26,7 +26,7 @@ export async function respondToUser(responderId, userId, responderLat, responder
   if (!user) throw new Error('User not found');
 
   const radiusKm = radiusFeet * 0.0003048;
-  const distance = getDistance(responderLat, responderLon, user.lat, user.long);
+  const distance = getDistance(responderLat, responderLon, user.lat, user.lon);
 
   if (distance <= radiusKm) {
     

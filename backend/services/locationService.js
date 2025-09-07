@@ -3,15 +3,15 @@ import { priorityQueue } from "./priorityQueue.js";
 
 const prisma = new PrismaClient();
 
-export async function saveUserLocation(userId, long, lat, danger = 0) {
+export async function saveUserLocation(userId, lon, lat, danger = 0) {
   await prisma.UserLocation.upsert({
     where: { userId },
-    update: { lat, long, timestamp: new Date() },
-    create: { userId, lat, long, timestamp: new Date() },
+    update: { lat, lon, timestamp: new Date() },
+    create: { userId, lat, lon, timestamp: new Date() },
   });
 
  
-  priorityQueue.push({ userId, lat, long, danger });
+  priorityQueue.push({ userId, lat, lon, danger });
 }
 
 export function getPriorityUsers(topN = 10) {
@@ -20,9 +20,5 @@ export function getPriorityUsers(topN = 10) {
 
 export async function getAllUserLocations() {
   return await prisma.userLocation.findMany();
-}
-
-export async function getAllUserLocations() {
-  return await prisma.UserLocation.findMany()
 }
 
