@@ -1,3 +1,10 @@
+import java.util.Properties
+
+val properties = Properties()
+val localPropertiesFile = project.rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { properties.load(it) }
+}
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -8,6 +15,11 @@ android {
     namespace = "com.selfemploye.naturaldisaster"
     compileSdk = 35
 
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.selfemploye.naturaldisaster"
         minSdk = 24
@@ -16,6 +28,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "MAP_API_KEY", properties.getProperty("API_KEY") ?: "\"\"")
+        buildConfigField("String", "BASE_URL", properties.getProperty("BASE_URL") ?: "\"\"")
     }
 
     buildTypes {
@@ -33,9 +48,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = "11"
-    }
-    buildFeatures {
-        compose = true
     }
 }
 
@@ -58,6 +70,9 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.play.services.maps)
     implementation(libs.maps.compose)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
