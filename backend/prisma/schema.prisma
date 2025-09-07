@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model UserLocation {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  lat       Float
+  lon       Float
+  safe      Boolean  @default(false)
+  timestamp DateTime @default(now())
+}
+
+model Alert {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  read      Boolean  @default(false)
+  timestamp DateTime @default(now())
+}
+
+model StormSnapshot {
+  id        String   @id @default(cuid())
+  lat       Float
+  lon       Float
+  radius    Float
+  severity  Int
+  timestamp DateTime @default(now())
+}
+
+model PriorityQueue {
+  id        String   @id @default(cuid())
+  userId    String
+  danger    Float
+  timestamp DateTime @default(now())
+}
